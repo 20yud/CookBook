@@ -51,10 +51,10 @@ export default function RecipeDetailScreen(props) {
 
     const getMealData = async (id)=>{
         try {
-            const mealsRef = ref(db, 'data/'+'monAnSang/'+'meals/' + id);  // Use 'id' directly in the path
-            onValue(mealsRef, (snapshot) => {
-                const mealData = snapshot.val();
-                console.log('mealData:', mealData);
+            const mealsRef = ref(db, 'data/monAnSang/meals/' + id);
+        onValue(mealsRef, (snapshot) => {
+            const mealData = snapshot.val();
+            console.log('mealData:', mealData);
                 // Check if the data exists and has the expected structure
                 if (!mealData || !mealData.idMeal) {
                     console.error('Invalid meal data structure');

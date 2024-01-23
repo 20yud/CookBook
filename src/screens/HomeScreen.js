@@ -69,9 +69,12 @@ export default function HomeScreen() {
     }
   }
   
-  const getRecipes = async () => {
+  const getRecipes = async (category = 'monAnSang/') => {
     try {
-      const starCountRef = ref(db, 'data/'+'monAnSang/');
+      // Make sure category is a string
+      const categoryPath = typeof category === 'string' ? category : 'monAnSang/';
+  
+      const starCountRef = ref(db, 'data/' + categoryPath);
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
   
