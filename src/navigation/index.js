@@ -8,6 +8,8 @@ import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import AccountScreen from '../screens/AccountScreen';
 import ForgetPasswordScreen from '../screens/ForgetPasswordScreen';
+import StepScreen from '../screens/StepScreen';
+import CreateScreen from '../screens/CreateScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,7 +23,9 @@ function AppNavigation() {
         <Stack.Screen name="Forget" component={ForgetPasswordScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
+        <Stack.Screen name="Create" component={CreateScreen} />
         <Stack.Screen name="RecipeDetail" options={{presentation: 'fullScreenModal'}} component={RecipeDetailScreen} />
+        <Stack.Screen name="Step" component={StepScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

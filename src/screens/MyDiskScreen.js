@@ -3,8 +3,29 @@ import React, { useEffect, useState } from 'react'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {BellIcon, MagnifyingGlassIcon} from 'react-native-heroicons/outline'
 import { StatusBar } from 'expo-status-bar'
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import axios from 'axios';
+import Recipes from '../components/recipes';
+import { useNavigation } from '@react-navigation/native';
 
 export default function MyDiskScreen() {
+  const [categories, setCategories] = useState([]);
+  const [meals, setMeals] = useState([]);
+  const navigation = useNavigation();
+    useEffect(()=>{
+      getRecipes();
+    },[])
+    const getRecipes = async (category="Beef")=>{
+      try{
+        const response = await axios.get(`https://themealdb.com/api/json/v1/1/filter.php?c=${category}`);
+        // console.log('got recipes: ',response.data);
+        if(response && response.data){
+          setMeals(response.data.meals);
+        }
+      }catch(err){
+        console.log('error: ',err.message);
+      }
+    }
     return (
         <View className="flex-1 bg-white">
           <StatusBar style="dark" />
@@ -24,6 +45,16 @@ export default function MyDiskScreen() {
                 <View className="bg-white rounded-full p-3">
                     <MagnifyingGlassIcon size={hp(2.5)} strokeWidth={3} color="gray" />
                 </View>
+            </View>
+
+            <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
+              <TouchableOpacity className="bg-yellow-400 mx-20 items-center rounded-full p-[6px]" onPress={()=> navigation.navigate('Create')}>
+                <Text className="text-xl font-bold text-center text-gray-700">Viết món mới</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            {/* recipes */}
+            <View>
+              <Recipes meals={meals} categories={categories} />
             </View>
           </ScrollView>
         </View>

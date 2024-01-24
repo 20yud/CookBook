@@ -37,7 +37,7 @@ export default function AccountScreen() {
       <View className="mx-4 flex-row justify-between items-center mb-2">
         <View className="flex-row">
           <TouchableOpacity onPress={()=> navigation.goBack()} className="rounded-full bg-white">
-            <ChevronLeftIcon size={hp(4)} strokeWidth={3} color="#fbbf24" />
+            <ChevronLeftIcon size={hp(4)} strokeWidth={4} color="#fbbf24" />
           </TouchableOpacity>
           <Image source={require('../../assets/images/avatar.png')} style={{height: hp(5), width: hp(5.5), marginRight: 7, marginLeft: 12}} />
           <View> 

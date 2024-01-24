@@ -14,6 +14,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../config";
 import { db } from '../../config';
 import { ref, onValue } from 'firebase/database';
+import slides from "../../slides";
 
 const ios = Platform.OS == 'ios';
 
@@ -228,6 +229,12 @@ export default function RecipeDetailScreen(props) {
                                     }
                                 </Text>
                             </Animated.View>
+                             {/* intostep */}
+                    <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
+                        <TouchableOpacity className="py-3 bg-yellow-400 rounded-xl" onPress={()=> navigation.navigate('Step',{ slidesData: slides })}>
+                            <Text className="text-xl font-bold text-center text-gray-700">Bắt đầu nấu ngay</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
                         </View>
                     )
                 }
