@@ -53,10 +53,8 @@ export default function RecipeDetailScreen(props) {
     const getMealData = async (category, id) => {
         try {
             const mealsRef = ref(db, 'data/' + category + 'meals/' + id);
-            console.log('data/' + category + 'meals/' + id)
             onValue(mealsRef, (snapshot) => {
                 const mealData = snapshot.val();
-                console.log('mealData:', mealData);
                 // Check if the data exists and has the expected structure
                 if (!mealData || !mealData.idMeal) {
                     console.error('Invalid meal data structure');
@@ -73,15 +71,52 @@ export default function RecipeDetailScreen(props) {
                     strInstructions: mealData.strInstructions,
                     strMeal: mealData.strMeal,
                     strMealThumb: mealData.strMealThumb,
+                    strIngredient1: mealData.strIngredient1,
+                    strIngredient2: mealData.strIngredient2,
+                    strIngredient3: mealData.strIngredient3,
+                    strIngredient4: mealData.strIngredient4,
+                    strIngredient5: mealData.strIngredient5,
+                    strIngredient6: mealData.strIngredient6,
+                    strIngredient7: mealData.strIngredient7,
+                    strIngredient8: mealData.strIngredient8,
+                    strIngredient9: mealData.strIngredient9,
+                    strIngredient10: mealData.strIngredient10,
+                    strIngredient11: mealData.strIngredient11,
+                    strIngredient12: mealData.strIngredient12,
+                    strIngredient13: mealData.strIngredient13,
+                    strIngredient14: mealData.strIngredient14,
+                    strIngredient15: mealData.strIngredient15,
+                    strIngredient16: mealData.strIngredient16,
+                    strIngredient17: mealData.strIngredient17,
+                    strIngredient18: mealData.strIngredient18,
+                    strIngredient19: mealData.strIngredient19,
+                    strIngredient20: mealData.strIngredient20,
                     strMeasure1: mealData.strMeasure1,
+                    strMeasure2: mealData.strMeasure2,
+                    strMeasure3: mealData.strMeasure3,
+                    strMeasure4: mealData.strMeasure4,
+                    strMeasure5: mealData.strMeasure5,
+                    strMeasure6: mealData.strMeasure6,
+                    strMeasure7: mealData.strMeasure7,
+                    strMeasure8: mealData.strMeasure8,
+                    strMeasure9: mealData.strMeasure9,
+                    strMeasure10: mealData.strMeasure10,
+                    strMeasure11: mealData.strMeasure11,
+                    strMeasure12: mealData.strMeasure12,
+                    strMeasure13: mealData.strMeasure13,
+                    strMeasure14: mealData.strMeasure14,
+                    strMeasure15: mealData.strMeasure15,
+                    strMeasure16: mealData.strMeasure16,
+                    strMeasure17: mealData.strMeasure17,
+                    strMeasure18: mealData.strMeasure18,
+                    strMeasure19: mealData.strMeasure19,
+                    strMeasure20: mealData.strMeasure20,
                     strSource: mealData.strSource,
                     strSteps: mealData.strSteps,
                     strTime: mealData.strTime,
                     strType: mealData.strType,
                     // Add other properties you need
                 };
-
-                console.log(transformedMeal);
                 // Assume setMeal is a function to update the React state
                 setMeal(transformedMeal);
                 setLoading(false);
@@ -229,12 +264,12 @@ export default function RecipeDetailScreen(props) {
                                     }
                                 </Text>
                             </Animated.View>
-                             {/* intostep */}
-                    <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
-                        <TouchableOpacity className="py-3 bg-yellow-400 rounded-xl" onPress={()=> navigation.navigate('Step',{ slidesData: slides })}>
-                            <Text className="text-xl font-bold text-center text-gray-700">Bắt đầu nấu ngay</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
+                            {/* intostep */}
+                            <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
+                                <TouchableOpacity className="py-3 bg-yellow-400 rounded-xl" onPress={() => navigation.navigate('Step', { slidesData: slides })}>
+                                    <Text className="text-xl font-bold text-center text-gray-700">Bắt đầu nấu ngay</Text>
+                                </TouchableOpacity>
+                            </Animated.View>
                         </View>
                     )
                 }

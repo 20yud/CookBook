@@ -42,7 +42,7 @@ export default function HomeScreen() {
 
   const getCategories = async () => {
     try {
-      const starCountRef = ref(db, 'data/' + 'categories/' );
+      const starCountRef = ref(db, 'data/' + 'categories/');
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
 
@@ -59,8 +59,6 @@ export default function HomeScreen() {
           strCategoryThumb: category.strCategoryThumb,
           strName: category.strName
         }));
-
-        console.log(newCategories);
         // Assume setCategories là một hàm hoặc phương thức để cập nhật trạng thái React
         setCategories(newCategories);
       });
@@ -99,8 +97,6 @@ export default function HomeScreen() {
           strType: meal.strType
           // Add other properties you need
         }));
-
-        console.log(newMeals);
         // Assume setMeals là một hàm hoặc phương thức để cập nhật trạng thái React
         setMeals(newMeals);
       });
