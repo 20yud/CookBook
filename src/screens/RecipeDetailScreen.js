@@ -38,7 +38,7 @@ export default function RecipeDetailScreen(props) {
     }, []);
 
     useEffect(()=>{
-        getMealData(item.idMeal);
+        getMealData(item.strCategory,item.idMeal);
     },[])
 
     const handleFavoritePress = async () => {
@@ -49,9 +49,9 @@ export default function RecipeDetailScreen(props) {
         }
     };
 
-    const getMealData = async (id)=>{
+    const getMealData = async (category, id)=>{
         try {
-            const mealsRef = ref(db, 'data/monAnSang/meals/' + id);
+            const mealsRef = ref(db, 'data/' + category+ 'meals/' + id);
         onValue(mealsRef, (snapshot) => {
             const mealData = snapshot.val();
             console.log('mealData:', mealData);
