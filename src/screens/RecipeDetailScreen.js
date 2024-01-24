@@ -25,6 +25,7 @@ export default function RecipeDetailScreen(props) {
     const [isFavourite, setIsFavourite] = useState(false);
     const navigation = useNavigation();
     const [meal, setMeal] = useState(null);
+    let [steps, setSteps] = useState(null);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
@@ -40,6 +41,7 @@ export default function RecipeDetailScreen(props) {
 
     useEffect(() => {
         getMealData(item.strCategory + '/', item.id - 1);
+        getStepData(item.strCategory + '/', item.id - 1);
     }, [])
 
     const handleFavoritePress = async () => {
@@ -49,7 +51,7 @@ export default function RecipeDetailScreen(props) {
             navigation.navigate('Login');
         }
     };
-
+    
     const getMealData = async (category, id) => {
         try {
             const mealsRef = ref(db, 'data/' + category + 'meals/' + id);
@@ -90,6 +92,37 @@ export default function RecipeDetailScreen(props) {
             console.error('Error: ', err.message);
         }
     }
+    const getStepData = async (category, id) => {
+        try {
+            const stepsRef = ref(db, `data/${category}meals/${id}/strSteps`);
+            console.log(`data/${category}meals/${id}/strSteps`);
+            
+            onValue(stepsRef, (snapshot) => {
+                const stepsData = snapshot.val();
+                console.log('stepsData:', stepsData);
+    
+                // Check if the data exists and has the expected structure
+                if (!stepsData) {
+                    console.error('Invalid steps data structure');
+                    return;
+                }
+    
+                // Transform the stepsData to match your expected structure
+                const transformedSteps = Object.entries(stepsData).map(([idStep, stepData]) => ({
+                    idStep,
+                    ...stepData,
+                }));
+    
+                console.log(transformedSteps);
+                // Assume setSteps is a function to update the React state
+                setSteps(transformedSteps);
+                setLoading(false);
+            });
+        } catch (err) {
+            console.error('Error: ', err.message);
+        }
+    }
+    
 
     const ingredientsIndexes = (meal) => {
         if (!meal) return [];
@@ -230,11 +263,16 @@ export default function RecipeDetailScreen(props) {
                                 </Text>
                             </Animated.View>
                              {/* intostep */}
-                    <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
-                        <TouchableOpacity className="py-3 bg-yellow-400 rounded-xl" onPress={()=> navigation.navigate('Step',{ slidesData: slides })}>
-                            <Text className="text-xl font-bold text-center text-gray-700">Bắt đầu nấu ngay</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
+                    {/* intostep */}
+                                <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)} className="space-y-4">
+                                    <TouchableOpacity
+                                        className="py-3 bg-yellow-400 rounded-xl"
+                                        onPress={() => navigation.navigate('Step', { steps })}
+                                    >
+                                        <Text className="text-xl font-bold text-center text-gray-700">Bắt đầu nấu ngay</Text>
+                                    </TouchableOpacity>
+                                </Animated.View>
+
                         </View>
                     )
                 }

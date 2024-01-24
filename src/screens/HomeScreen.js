@@ -14,7 +14,7 @@ import { ref, onValue, DataSnapshot } from 'firebase/database';
 
 
 export default function HomeScreen() {
-  const [activeCategory, setActiveCategory] = useState('Beef');
+  const [activeCategory, setActiveCategory] = useState('monAnSang');
   const [categories, setCategories] = useState([]);
   const [meals, setMeals] = useState([]);
   const navigation = useNavigation();

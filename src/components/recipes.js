@@ -8,7 +8,7 @@ import Loading from './loading';
 import { CachedImage } from '../helpers/image';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Recipes({ categories, meals }) {
+export default function Recipes({ meals }) {
     const navigation = useNavigation();
     console.log('meal: ', meals);
     return (
@@ -24,7 +24,7 @@ export default function Recipes({ categories, meals }) {
 
                             keyExtractor={(item) => {
                                 item.id;
-                                console.log(item.id);
+                               
                             }}
                             numColumns={2}
                             showsVerticalScrollIndicator={false}

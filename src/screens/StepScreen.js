@@ -1,13 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, Animated } from 'react-native';
 import Step from '../components/step';
 import Paginator from '../components/Paginator';
 import { ChevronLeftIcon } from 'react-native-heroicons/outline';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
+import { db } from '../../config';
+import { ref, onValue } from 'firebase/database';
 
 export default function StepScreen({ route }) {
-  const { slidesData } = route.params;
+  const { steps } = route.params;
   const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -19,6 +21,10 @@ export default function StepScreen({ route }) {
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
+
+
+
+
   return (
     <View style={{ flex: 1 , backgroundColor: 'white' }}>
       <View style={{ paddingVertical: hp(2) }}>
@@ -28,7 +34,7 @@ export default function StepScreen({ route }) {
       </View>
       <View style={{ flex: 3 , backgroundColor: 'white' }}>
         <FlatList
-          data={slidesData}
+          data={steps}
           renderItem={({ item }) => <Step item={item} />}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -45,7 +51,7 @@ export default function StepScreen({ route }) {
         />
       </View>
       <View style={{ alignItems: 'center', backgroundColor: 'white' }}>
-        <Paginator data={slidesData} scrollX={scrollX} />
+        <Paginator data={steps} scrollX={scrollX} />
       </View>
     </View>
   );
