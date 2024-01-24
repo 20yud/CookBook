@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {MagnifyingGlassIcon} from 'react-native-heroicons/outline'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { MagnifyingGlassIcon } from 'react-native-heroicons/outline'
 import Categories from '../components/categories';
 import axios from 'axios';
 import Recipes from '../components/recipes';
@@ -30,36 +30,35 @@ export default function HomeScreen() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     getCategories();
     getRecipes();
-  },[])
+  }, [])
 
-  const handleChangeCategory = category=>{
+  const handleChangeCategory = category => {
     getRecipes(category);
     setActiveCategory(category);
-    setMeals([]);
   }
 
   const getCategories = async () => {
     try {
-      const starCountRef = ref(db, 'data/'+'categories/');
+      const starCountRef = ref(db, 'data/' + 'categories/');
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-  
+
         // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
         if (!data || !data.categories || !Array.isArray(data.categories)) {
           console.error('Invalid data structure');
           return;
         }
-  
+
         // Trích xuất dữ liệu từ mảng categories
         const newCategories = data.categories.map(category => ({
           id: category.idCategory,
           strCategory: category.strCategory,
           strCategoryThumb: category.strCategoryThumb
         }));
-  
+
         console.log(newCategories);
         // Assume setCategories là một hàm hoặc phương thức để cập nhật trạng thái React
         setCategories(newCategories);
@@ -68,22 +67,20 @@ export default function HomeScreen() {
       console.error('Error: ', err.message);
     }
   }
-  
-  const getRecipes = async (category = 'monAnSang/') => {
+
+  const getRecipes = async (category = 'monAnSang') => {
     try {
       // Make sure category is a string
-      const categoryPath = typeof category === 'string' ? category : 'monAnSang/';
-  
+      const categoryPath = typeof category === 'string' ? category : 'monAnSang';
       const starCountRef = ref(db, 'data/' + categoryPath);
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-  
         // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
         if (!data || !data.meals || !Array.isArray(data.meals)) {
           console.error('Invalid data structure');
           return;
         }
-  
+
         // Trích xuất dữ liệu từ mảng meals
         const newMeals = data.meals.map(meal => ({
           id: meal.idMeal,
@@ -101,7 +98,7 @@ export default function HomeScreen() {
           strType: meal.strType
           // Add other properties you need
         }));
-  
+
         console.log(newMeals);
         // Assume setMeals là một hàm hoặc phương thức để cập nhật trạng thái React
         setMeals(newMeals);
@@ -110,7 +107,7 @@ export default function HomeScreen() {
       console.error('Error: ', err.message);
     }
   }
-  
+
   const handleAvatarPress = () => {
     if (user) {
       navigation.navigate('Account');
@@ -123,16 +120,16 @@ export default function HomeScreen() {
       <StatusBar style="dark" />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 50}}
+        contentContainerStyle={{ paddingBottom: 50 }}
         className="space-y-6 pt-14"
       >
         {/* avatar and bell icon */}
         <View className="mx-4 flex-row justify-between items-center mb-2">
           <TouchableOpacity onPress={handleAvatarPress}>
-            {user?
-              <Image source={require('../../assets/images/avatar.png')} style={{height: hp(5), width: hp(5.5)}} />
+            {user ?
+              <Image source={require('../../assets/images/avatar.png')} style={{ height: hp(5), width: hp(5.5) }} />
               :
-              <Image source={require('../../assets/images/welcome.png')} style={{height: hp(5), width: hp(5.5)}} />
+              <Image source={require('../../assets/images/welcome.png')} style={{ height: hp(5), width: hp(5.5) }} />
             }
           </TouchableOpacity>
         </View>
@@ -144,10 +141,10 @@ export default function HomeScreen() {
               Xin chào, {user.email}
             </Text>
           )}
-        <View>
-            <Text style={{fontSize: hp(3.8)}} className="font-semibold text-neutral-600">Tự nấu các món ngon</Text>
+          <View>
+            <Text style={{ fontSize: hp(3.8) }} className="font-semibold text-neutral-600">Tự nấu các món ngon</Text>
           </View>
-          <Text style={{fontSize: hp(3.8)}} className="font-semibold text-neutral-600">
+          <Text style={{ fontSize: hp(3.8) }} className="font-semibold text-neutral-600">
             ngay tại <Text className="text-amber-400">nhà</Text>
           </Text>
         </View>
@@ -157,7 +154,7 @@ export default function HomeScreen() {
           <TextInput
             placeholder='Tìm tên món ăn'
             placeholderTextColor={'gray'}
-            style={{fontSize: hp(1.7)}}
+            style={{ fontSize: hp(1.7) }}
             className="flex-1 text-base mb-1 pl-3 tracking-wider"
           />
           <View className="bg-white rounded-full p-3">
@@ -167,7 +164,7 @@ export default function HomeScreen() {
 
         {/* categories */}
         <View>
-          { categories.length>0 && <Categories categories={categories} activeCategory={activeCategory} handleChangeCategory={handleChangeCategory} /> }
+          {categories.length > 0 && <Categories categories={categories} activeCategory={activeCategory} handleChangeCategory={handleChangeCategory} />}
         </View>
 
         {/* recipes */}
