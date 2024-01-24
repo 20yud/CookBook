@@ -37,7 +37,7 @@ export default function Categories({categories, activeCategory, handleChangeCate
                             />
                         </View>
                         <Text className="text-neutral-600" style={{fontSize: hp(1.6)}}>
-                            {cat.strCategory}
+                            {cat.strName}
                         </Text>
                     </TouchableOpacity>
                 )

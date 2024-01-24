@@ -37,9 +37,9 @@ export default function RecipeDetailScreen(props) {
         return () => unsubscribe();
     }, []);
 
-    useEffect(()=>{
-        getMealData(item.idMeal);
-    },[])
+    useEffect(() => {
+        getMealData(item.strCategory + '/', item.id - 1);
+    }, [])
 
     const handleFavoritePress = async () => {
         if (user) {
@@ -49,12 +49,13 @@ export default function RecipeDetailScreen(props) {
         }
     };
 
-    const getMealData = async (id)=>{
+    const getMealData = async (category, id) => {
         try {
-            const mealsRef = ref(db, 'data/monAnSang/meals/' + id);
-        onValue(mealsRef, (snapshot) => {
-            const mealData = snapshot.val();
-            console.log('mealData:', mealData);
+            const mealsRef = ref(db, 'data/' + category + 'meals/' + id);
+            console.log('data/' + category + 'meals/' + id)
+            onValue(mealsRef, (snapshot) => {
+                const mealData = snapshot.val();
+                console.log('mealData:', mealData);
                 // Check if the data exists and has the expected structure
                 if (!mealData || !mealData.idMeal) {
                     console.error('Invalid meal data structure');

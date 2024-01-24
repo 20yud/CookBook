@@ -42,7 +42,7 @@ export default function HomeScreen() {
 
   const getCategories = async () => {
     try {
-      const starCountRef = ref(db, 'data/' + 'categories/');
+      const starCountRef = ref(db, 'data/' + 'categories/' );
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
 
@@ -56,7 +56,8 @@ export default function HomeScreen() {
         const newCategories = data.categories.map(category => ({
           id: category.idCategory,
           strCategory: category.strCategory,
-          strCategoryThumb: category.strCategoryThumb
+          strCategoryThumb: category.strCategoryThumb,
+          strName: category.strName
         }));
 
         console.log(newCategories);
