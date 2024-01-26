@@ -1,16 +1,17 @@
 import { View, Text, Pressable, Image } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MasonryList from '@react-native-seoul/masonry-list';
-import { mealData } from '../constants';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Loading from './loading';
 import { CachedImage } from '../helpers/image';
 import { useNavigation } from '@react-navigation/native';
 
+
+
 export default function Recipes({ categories, meals }) {
+
     const navigation = useNavigation();
-    console.log('meal: ', meals);
     return (
         <View className="mx-4 space-y-3">
             <Text style={{ fontSize: hp(3) }} className="font-semibold text-neutral-600">Recipes</Text>
@@ -21,11 +22,6 @@ export default function Recipes({ categories, meals }) {
                     ) : (
                         <MasonryList
                             data={meals}
-
-                            keyExtractor={(item) => {
-                                item.id;
-                                console.log(item.id);
-                            }}
                             numColumns={2}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item, i }) => <RecipeCard item={item} index={i} navigation={navigation} />}

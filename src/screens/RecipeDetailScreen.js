@@ -13,7 +13,7 @@ import { Platform } from 'react-native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../config";
 import { db } from '../../config';
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, set, remove, get } from 'firebase/database';
 import slides from "../../slides";
 
 const ios = Platform.OS == 'ios';
@@ -22,7 +22,7 @@ const ios = Platform.OS == 'ios';
 
 export default function RecipeDetailScreen(props) {
     let item = props.route.params;
-    const [isFavourite, setIsFavourite] = useState(false);
+    const [isFavourite, setIsFavourite] = useState(null);
     const navigation = useNavigation();
     const [meal, setMeal] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -33,94 +33,189 @@ export default function RecipeDetailScreen(props) {
             // authUser sẽ là null nếu không có ai đăng nhập
             setUser(authUser);
         });
-
         // Hủy đăng ký sự kiện khi component bị hủy
         return () => unsubscribe();
     }, []);
 
     useEffect(() => {
-        getMealData(item.strCategory + '/', item.id - 1);
-    }, [])
-
-    const handleFavoritePress = async () => {
         if (user) {
-            setIsFavourite(!isFavourite)
-        } else {
-            navigation.navigate('Login');
+            checkFavorites(item, user.uid);
         }
-    };
-
-    const getMealData = async (category, id) => {
+    }, [user])
+    useEffect(() => {
+        getMealData(item);
+    }, [])
+    const addFavorite = async (item, uid) => {
         try {
-            const mealsRef = ref(db, 'data/' + category + 'meals/' + id);
-            onValue(mealsRef, (snapshot) => {
-                const mealData = snapshot.val();
-                // Check if the data exists and has the expected structure
-                if (!mealData || !mealData.idMeal) {
-                    console.error('Invalid meal data structure');
-                    return;
-                }
+            if (user !== null) {
+                const usersRef = ref(db, 'users');
+                get(usersRef).then(snapshot => {
+                    const usersData = snapshot.val();
+                    // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
+                    if (usersData && Array.isArray(usersData)) {
+                        const userIndex = usersData.findIndex(user => user && user.userID === uid);
+                        if (userIndex !== -1 && usersData[userIndex].favorites) {
+                            const favoriteData = usersData[userIndex].favorites;
+                            //insert dữ liệu favorite mới
+                            for (let i = 0; i <= favoriteData.length; i++) {
+                                if (favoriteData[i] == undefined || favoriteData[i] == null) {
+                                    set(ref(db, 'users/' + userIndex + '/favorites/' + i), {
+                                        idMeal: parseInt(item.idMeal),
+                                        strCategory: item.strCategory
+                                    })
+                                    console.log('add done')
+                                    break;
+                                }
+                            }
+                        } else {
+                            console.log('User not found or has no favorite data.');
+                            return null;
+                        }
+                    } else {
+                        console.log('Invalid users data structure.');
+                        return null;
+                    }
+                })
+            }
+        } catch (err) {
+            console.error('Error: ', err.message);
+        }
+    }
 
-                // Transform the mealData to match your expected structure
-                const transformedMeal = {
-                    idMeal: mealData.idMeal,
-                    strArea: mealData.strArea,
-                    strCategory: mealData.strCategory,
-                    // Add other properties you need
-                    strServing: mealData.strServing,
-                    strInstructions: mealData.strInstructions,
-                    strMeal: mealData.strMeal,
-                    strMealThumb: mealData.strMealThumb,
-                    strIngredient1: mealData.strIngredient1,
-                    strIngredient2: mealData.strIngredient2,
-                    strIngredient3: mealData.strIngredient3,
-                    strIngredient4: mealData.strIngredient4,
-                    strIngredient5: mealData.strIngredient5,
-                    strIngredient6: mealData.strIngredient6,
-                    strIngredient7: mealData.strIngredient7,
-                    strIngredient8: mealData.strIngredient8,
-                    strIngredient9: mealData.strIngredient9,
-                    strIngredient10: mealData.strIngredient10,
-                    strIngredient11: mealData.strIngredient11,
-                    strIngredient12: mealData.strIngredient12,
-                    strIngredient13: mealData.strIngredient13,
-                    strIngredient14: mealData.strIngredient14,
-                    strIngredient15: mealData.strIngredient15,
-                    strIngredient16: mealData.strIngredient16,
-                    strIngredient17: mealData.strIngredient17,
-                    strIngredient18: mealData.strIngredient18,
-                    strIngredient19: mealData.strIngredient19,
-                    strIngredient20: mealData.strIngredient20,
-                    strMeasure1: mealData.strMeasure1,
-                    strMeasure2: mealData.strMeasure2,
-                    strMeasure3: mealData.strMeasure3,
-                    strMeasure4: mealData.strMeasure4,
-                    strMeasure5: mealData.strMeasure5,
-                    strMeasure6: mealData.strMeasure6,
-                    strMeasure7: mealData.strMeasure7,
-                    strMeasure8: mealData.strMeasure8,
-                    strMeasure9: mealData.strMeasure9,
-                    strMeasure10: mealData.strMeasure10,
-                    strMeasure11: mealData.strMeasure11,
-                    strMeasure12: mealData.strMeasure12,
-                    strMeasure13: mealData.strMeasure13,
-                    strMeasure14: mealData.strMeasure14,
-                    strMeasure15: mealData.strMeasure15,
-                    strMeasure16: mealData.strMeasure16,
-                    strMeasure17: mealData.strMeasure17,
-                    strMeasure18: mealData.strMeasure18,
-                    strMeasure19: mealData.strMeasure19,
-                    strMeasure20: mealData.strMeasure20,
-                    strSource: mealData.strSource,
-                    strSteps: mealData.strSteps,
-                    strTime: mealData.strTime,
-                    strType: mealData.strType,
-                    // Add other properties you need
-                };
-                // Assume setMeal is a function to update the React state
-                setMeal(transformedMeal);
-                setLoading(false);
-            });
+    const removeFavorite = async (item, uid) => {
+        try {
+            if (user !== null) {
+                const usersRef = ref(db, 'users');
+                get(usersRef).then(snapshot => {
+                    const usersData = snapshot.val();
+                    // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
+                    if (usersData && Array.isArray(usersData)) {
+                        const userIndex = usersData.findIndex(user => user && user.userID === uid);
+
+                        if (userIndex !== -1 && usersData[userIndex].favorites) {
+                            const favoriteData = usersData[userIndex].favorites;
+                            const favoriteIndex = favoriteData.findIndex(data => data && data.idMeal == item.idMeal && data.strCategory == item.strCategory);
+                            //remove
+                            try {
+                                remove(ref(db, 'users/' + userIndex + '/favorites/' + favoriteIndex))
+                                console.log('remove done');
+                            } catch {
+                                console.log('remove error');
+                            }
+                        } else {
+                            console.log('User not found or has no favorite data.');
+                            return null;
+                        }
+                    } else {
+                        console.log('Invalid users data structure.');
+                        return null;
+                    }
+                })
+            }
+        } catch (err) {
+            console.error('Error: ', err.message);
+        }
+    }
+
+    const checkFavorites = async (item, uid) => {
+        try {
+            if (user !== null) {
+                const usersRef = ref(db, 'users');
+                onValue(usersRef, (snapshot) => {
+                    const usersData = snapshot.val();
+                    // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
+                    if (usersData && Array.isArray(usersData)) {
+                        const userIndex = usersData.findIndex(user => user && user.userID === uid);
+                        if (userIndex !== -1 && usersData[userIndex].favorites) {
+                            const favoriteData = usersData[userIndex].favorites;
+                            const meal = {
+                                idMeal: parseInt(item.idMeal),
+                                strCategory: item.strCategory
+                            }
+                            for (let i = 0; i < favoriteData.length; i++) {
+                                if (favoriteData[i] == undefined || favoriteData[i] == null) { continue }
+                                else if (favoriteData[i].idMeal == meal.idMeal && favoriteData[i].strCategory == meal.strCategory) {
+                                    return setIsFavourite(true);
+                                }
+                            }
+                            return setIsFavourite(false);
+                        } else {
+                            console.log('User not found or has no favorite data.');
+                            return null;
+                        }
+                    } else {
+                        console.log('Invalid users data structure.');
+                        return null;
+                    }
+                })
+            }
+        } catch (err) {
+            console.error('Error: ', err.message);
+        }
+    }
+
+    const getMealData = async (item) => {
+        try {
+            // Transform the mealData to match your expected structure
+            const transformedMeal = {
+                idMeal: item.idMeal,
+                strArea: item.strArea,
+                strCategory: item.strCategory,
+                // Add other properties you need
+                strServing: item.strServing,
+                strInstructions: item.strInstructions,
+                strMeal: item.strMeal,
+                strMealThumb: item.strMealThumb,
+                strIngredient1: item.strIngredient1,
+                strIngredient2: item.strIngredient2,
+                strIngredient3: item.strIngredient3,
+                strIngredient4: item.strIngredient4,
+                strIngredient5: item.strIngredient5,
+                strIngredient6: item.strIngredient6,
+                strIngredient7: item.strIngredient7,
+                strIngredient8: item.strIngredient8,
+                strIngredient9: item.strIngredient9,
+                strIngredient10: item.strIngredient10,
+                strIngredient11: item.strIngredient11,
+                strIngredient12: item.strIngredient12,
+                strIngredient13: item.strIngredient13,
+                strIngredient14: item.strIngredient14,
+                strIngredient15: item.strIngredient15,
+                strIngredient16: item.strIngredient16,
+                strIngredient17: item.strIngredient17,
+                strIngredient18: item.strIngredient18,
+                strIngredient19: item.strIngredient19,
+                strIngredient20: item.strIngredient20,
+                strMeasure1: item.strMeasure1,
+                strMeasure2: item.strMeasure2,
+                strMeasure3: item.strMeasure3,
+                strMeasure4: item.strMeasure4,
+                strMeasure5: item.strMeasure5,
+                strMeasure6: item.strMeasure6,
+                strMeasure7: item.strMeasure7,
+                strMeasure8: item.strMeasure8,
+                strMeasure9: item.strMeasure9,
+                strMeasure10: item.strMeasure10,
+                strMeasure11: item.strMeasure11,
+                strMeasure12: item.strMeasure12,
+                strMeasure13: item.strMeasure13,
+                strMeasure14: item.strMeasure14,
+                strMeasure15: item.strMeasure15,
+                strMeasure16: item.strMeasure16,
+                strMeasure17: item.strMeasure17,
+                strMeasure18: item.strMeasure18,
+                strMeasure19: item.strMeasure19,
+                strMeasure20: item.strMeasure20,
+                strSource: item.strSource,
+                strSteps: item.strSteps,
+                strTime: item.strTime,
+                strType: item.strType,
+                // Add other properties you need
+            };
+            // Assume setMeal is a function to update the React state
+            setMeal(transformedMeal);
+            setLoading(false);
+
         } catch (err) {
             console.error('Error: ', err.message);
         }
@@ -161,9 +256,11 @@ export default function RecipeDetailScreen(props) {
                     <TouchableOpacity onPress={() => navigation.goBack()} className="p-2 rounded-full ml-5 bg-white">
                         <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleFavoritePress} className="p-2 rounded-full mr-5 bg-white">
-                        <HeartIcon size={hp(3.5)} strokeWidth={4.5} color={isFavourite ? "red" : "gray"} />
-                    </TouchableOpacity>
+                    {user !== null ? (
+                        <TouchableOpacity className="p-2 rounded-full mr-5 bg-white">
+                            <HeartIcon onPress={() => isFavourite ? removeFavorite(item, user.uid) : addFavorite(item, user.uid)} size={hp(3.5)} strokeWidth={4.5} color={isFavourite ? "red" : "gray"} />
+                        </TouchableOpacity>
+                    ) : null}
                 </Animated.View>
 
                 {/* meal description */}
