@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, Alert } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {ArrowLeftIcon} from 'react-native-heroicons/solid'
@@ -23,6 +23,12 @@ export default function LoginScreen() {
   }, [])
 
   const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Thông báo', 'Hãy nhập đầy đủ thông tin', [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
+      return;
+    }
     signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;

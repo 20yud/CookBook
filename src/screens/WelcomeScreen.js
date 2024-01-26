@@ -21,25 +21,25 @@ export default function WelcomeScreen() {
         setTimeout(()=> navigation.navigate('Home'), 2500)
     },[])
   return (
-    <View className="flex-1 justify-center items-center space-y-10 bg-amber-500">
+    <View className="flex-1 justify-center items-center space-y-10 bg-amber-300">
       <StatusBar style="light" />
 
       {/* logo image with rings */}
       <Animated.View className="bg-white/20 rounded-full" style={{padding: ring2padding}}>
         <Animated.View className="bg-white/20 rounded-full" style={{padding: ring1padding}}>
-            <Image source={require('../../assets/images/welcome.png')}
-                style={{width: hp(20), height: hp(20)}} />
+            <Image
+                source={require('../../assets/images/cake.png')}
+                style={{width: hp(25), height: hp(25)}}
+                resizeMode='contain'
+            />
         </Animated.View>
       </Animated.View>
-
       {/* title and punchline */}
       <View className="flex items-center space-y-2">
-        <Text style={{fontSize: hp(7)}} className="font-bold text-white tracking-widest">
-            Foody
-        </Text>
-        <Text style={{fontSize: hp(2)}} className="font-medium text-white tracking-widest">
-            Food is always right
-        </Text>
+        <Image
+            source={require('../../assets/images/recipes.png')}
+            style={{width: hp(30), height: hp(15)}}
+        />
       </View>
     </View>
   )

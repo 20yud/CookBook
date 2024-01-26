@@ -1,6 +1,6 @@
 import AccountNavigation from '../navigation/index2';
 import React, { useRef, useState } from 'react'
-import { View, Text, ScrollView, Image, TextInput, TouchableOpacity, ViewBase } from 'react-native'
+import { View, Text, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native'
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { ChevronLeftIcon, ArrowRightOnRectangleIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';

@@ -1,25 +1,52 @@
-import { View, Text, TouchableOpacity, Image, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, Alert } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {ArrowLeftIcon} from 'react-native-heroicons/solid';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../config"
+import { auth } from "../../config";
+import { db } from "../../config";
+import { ref, set, get } from 'firebase/database';
 
 export default function SignUpScreen() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
   const handleSignUp = () => {
-    createUserWithEmailAndPassword(auth ,email, password)
+    if (!name || !email || !password) {
+      Alert.alert('Thông báo', 'Hãy nhập đầy đủ thông tin', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+      return;
+    }
+  
+    createUserWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        console.log('Registered with:', user.email);
+  
+        const uRef = ref(db, 'users');
+        get(uRef).then(snapshot => {
+          const data = snapshot.val();
+          const nodeCount = Object.values(data).length;
+          if (nodeCount) {
+            const userRef = ref(db, `users/${nodeCount}`);
+            const userData = {
+              userId: user.uid,
+              userName: name,
+            };
+            set(userRef, userData);
+            console.log('Registered with:', user.email);
+          } else {
+            console.log("Sai");
+          }
+        }).catch(error => console.error('Error getting data:', error.message));
       })
-      .catch(error => alert(error.message))
+      .catch(error => alert("Đăng kí thất bại"))
   }
+  
   
   return (
     <View className="flex-1 bg-white" style={{backgroundColor: '#525252'}}>
@@ -43,6 +70,8 @@ export default function SignUpScreen() {
         <View className="form space-y-2">
             <Text className="text-gray-700 ml-4">Họ và tên</Text>
             <TextInput
+                value={name}
+                onChangeText = {text => setName(text)}
                 className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3"
                 placeholder='Nhập vào họ tên đầy đủ'
             />

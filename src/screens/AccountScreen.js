@@ -7,20 +7,43 @@ import { useNavigation } from '@react-navigation/native';
 import { signOut } from "firebase/auth";
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../config";
+import { db } from '../../config';
+import { ref, get, DataSnapshot, onValue} from 'firebase/database';
+
 
 export default function AccountScreen() {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
+  const [name, setName] = useState("sss");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      // authUser sẽ là null nếu không có ai đăng nhập
       setUser(authUser);
     });
-
-    // Hủy đăng ký sự kiện khi component bị hủy
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user)
+      {
+        const uRef = ref(db, 'users/');
+        get(uRef).then(snapshot => {
+          const userData = snapshot.val();
+          if (userData){
+            const userIndex = userData.findIndex(user => user && user.userID === user.uid);
+            const uRef2 = ref(db, 'users/' + userIndex +'/');
+            get(uRef2).then(snapshot => {
+              const userDat = snapshot.val();
+              if (userDat){
+                const userName = userDat.userName;
+                setName(userName);
+                console.log(name);
+              }
+            });
+          }
+        });
+      }
+  }, [user]);
 
   const handleLogOutPress = async () => {
     try {
@@ -41,9 +64,11 @@ export default function AccountScreen() {
           </TouchableOpacity>
           <Image source={require('../../assets/images/avatar.png')} style={{height: hp(5), width: hp(5.5), marginRight: 7, marginLeft: 12}} />
           <View> 
-            <Text style={{ fontSize: hp(2) }} className="text-neutral-600">
-              Hieu Nguyen
-            </Text>
+            {user && name && (
+              <Text style={{ fontSize: hp(2) }} className="text-neutral-600">
+                {name}
+              </Text>
+            )}
             {user && (
               <Text style={{ fontSize: hp(1.6), color: 'gray' }} className="text-neutral-600">
                 {user.email}
