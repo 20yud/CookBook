@@ -7,20 +7,28 @@ import { useNavigation } from '@react-navigation/native';
 import { signOut } from "firebase/auth";
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../config";
+import { db } from '../../config';
+import { ref, get, DataSnapshot, onValue, getDatabase} from 'firebase/database';
+
 
 export default function AccountScreen() {
   const navigation = useNavigation();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState("");
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      // authUser sẽ là null nếu không có ai đăng nhập
       setUser(authUser);
     });
-
-    // Hủy đăng ký sự kiện khi component bị hủy
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if(user){
+      getUserData();
+    }
+    
+  }, [user]);
 
   const handleLogOutPress = async () => {
     try {
@@ -31,6 +39,41 @@ export default function AccountScreen() {
       console.error('Error signing out:', error);
     }
   };
+ const getUserData = async () => {
+  try {
+    const dbRef = ref(getDatabase(), 'users/');
+    const snapshot = await get(dbRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+      const usersArray = Object.values(usersData);
+
+      // Assuming user is not null and has a uid
+      const targetUserID = user.uid;
+
+      console.log("Current User ID:", targetUserID);
+      
+      const targetUser = usersArray.find(userData => {
+        const lowerCaseUserID = userData?.userID ? userData.userID : '';
+        const lowerCaseUserId = userData?.userId ? userData.userId : '';
+        return lowerCaseUserID === targetUserID || lowerCaseUserId === targetUserID;
+      });
+      
+      if (targetUser) {
+        const targetUserName = targetUser?.userName;
+        console.log("User ID:", targetUserID);
+        console.log("User Name:", targetUserName);
+        setName(targetUserName);
+      } else {
+        console.warn(`User with userID ${targetUserID} not found`);
+      }
+    } else {
+      console.warn("No data found at the specified path");
+    }
+  } catch (error) {
+    console.error("Error retrieving user data:", error);
+  }
+};
 
   return (
     <View className="flex-1 bg-white space-y-6 pt-14">
@@ -41,9 +84,11 @@ export default function AccountScreen() {
           </TouchableOpacity>
           <Image source={require('../../assets/images/avatar.png')} style={{height: hp(5), width: hp(5.5), marginRight: 7, marginLeft: 12}} />
           <View> 
-            <Text style={{ fontSize: hp(2) }} className="text-neutral-600">
-              Hieu Nguyen
-            </Text>
+            {user && name && (
+              <Text style={{ fontSize: hp(2) }} className="text-neutral-600">
+                {name}
+              </Text>
+            )}
             {user && (
               <Text style={{ fontSize: hp(1.6), color: 'gray' }} className="text-neutral-600">
                 {user.email}

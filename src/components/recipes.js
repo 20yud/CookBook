@@ -10,10 +10,9 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function Recipes({ meals }) {
     const navigation = useNavigation();
-    console.log('meal: ', meals);
     return (
         <View className="mx-4 space-y-3">
-            <Text style={{ fontSize: hp(3) }} className="font-semibold text-neutral-600">Recipes</Text>
+            <Text style={{ fontSize: hp(3) }} className="font-semibold text-neutral-600">Công thức</Text>
             <View>
                 {
                     meals.length == 0 ? (

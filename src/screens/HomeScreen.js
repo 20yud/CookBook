@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../config";
 import { db } from '../../config';
-import { ref, onValue, DataSnapshot } from 'firebase/database';
+import { ref, onValue, getDatabase ,get} from 'firebase/database';
 
 
 export default function HomeScreen() {
@@ -19,6 +19,16 @@ export default function HomeScreen() {
   const [meals, setMeals] = useState([]);
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
+  const [search, setSearch] = useState();
+  const [name, setName] = useState("");
+
+  //Ham bo dau
+  function removeDiacritics(str) {
+  const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const replacedStr = normalizedStr.replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+
+  return replacedStr;
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
@@ -28,24 +38,63 @@ export default function HomeScreen() {
 
     // Hủy đăng ký sự kiện khi component bị hủy
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     getCategories();
-    getRecipes();
-  }, [])
+    getRecipes(activeCategory);
+  }, [search])
+
+  useEffect(() => {
+    if(user){
+      getUserData();
+    }
+    
+  }, [user]);
 
   const handleChangeCategory = category => {
     getRecipes(category);
     setActiveCategory(category);
   }
 
+
+  const getUserData = async () => {
+    try {
+      const dbRef = ref(getDatabase(), 'users/');
+      const snapshot = await get(dbRef);
+  
+      if (snapshot.exists()) {
+        const usersData = snapshot.val();
+        const usersArray = Object.values(usersData);
+  
+        // Assuming user is not null and has a uid
+        const targetUserID = user.uid;
+        
+        const targetUser = usersArray.find(userData => {
+          const lowerCaseUserID = userData?.userID ? userData.userID : '';
+          const lowerCaseUserId = userData?.userId ? userData.userId : '';
+          return lowerCaseUserID === targetUserID || lowerCaseUserId === targetUserID;
+        });
+        
+        if (targetUser) {
+          const targetUserName = targetUser?.userName;
+          setName(targetUserName);
+        } else {
+          console.warn(`User with userID ${targetUserID} not found`);
+        }
+      } else {
+        console.warn("No data found at the specified path");
+      }
+    } catch (error) {
+      console.error("Error retrieving user data:", error);
+    }
+  };
+
   const getCategories = async () => {
     try {
-      const starCountRef = ref(db, 'data/' + 'categories/' );
+      const starCountRef = ref(db, 'data/' + 'categories/');
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-
         // Kiểm tra nếu dữ liệu không tồn tại hoặc không phải là một mảng
         if (!data || !data.categories || !Array.isArray(data.categories)) {
           console.error('Invalid data structure');
@@ -59,8 +108,6 @@ export default function HomeScreen() {
           strCategoryThumb: category.strCategoryThumb,
           strName: category.strName
         }));
-
-        console.log(newCategories);
         // Assume setCategories là một hàm hoặc phương thức để cập nhật trạng thái React
         setCategories(newCategories);
       });
@@ -81,26 +128,81 @@ export default function HomeScreen() {
           console.error('Invalid data structure');
           return;
         }
+        let mealList = null
+        if (!search) {
+          mealList = data.meals
+        }
+
+        else {
+          mealList = data.meals.filter((item) => {
+            let text1 = removeDiacritics(item.strMeal);
+            let text2 = removeDiacritics(search);
+            if (text1.includes(text2)) {
+              return true
+            }
+            else {
+              return false
+            }
+          })
+        }
 
         // Trích xuất dữ liệu từ mảng meals
-        const newMeals = data.meals.map(meal => ({
-          id: meal.idMeal,
+        const newMeals = mealList.map(meal => ({
+          idMeal: meal.idMeal,
           strArea: meal.strArea,
           strCategory: meal.strCategory,
-          strIngredient1: meal.strIngredient1,
+
           // Add other properties you need
+          strServing: meal.strServing,
           strInstructions: meal.strInstructions,
           strMeal: meal.strMeal,
           strMealThumb: meal.strMealThumb,
+          strIngredient1: meal.strIngredient1,
+          strIngredient2: meal.strIngredient2,
+          strIngredient3: meal.strIngredient3,
+          strIngredient4: meal.strIngredient4,
+          strIngredient5: meal.strIngredient5,
+          strIngredient6: meal.strIngredient6,
+          strIngredient7: meal.strIngredient7,
+          strIngredient8: meal.strIngredient8,
+          strIngredient9: meal.strIngredient9,
+          strIngredient10: meal.strIngredient10,
+          strIngredient11: meal.strIngredient11,
+          strIngredient12: meal.strIngredient12,
+          strIngredient13: meal.strIngredient13,
+          strIngredient14: meal.strIngredient14,
+          strIngredient15: meal.strIngredient15,
+          strIngredient16: meal.strIngredient16,
+          strIngredient17: meal.strIngredient17,
+          strIngredient18: meal.strIngredient18,
+          strIngredient19: meal.strIngredient19,
+          strIngredient20: meal.strIngredient20,
           strMeasure1: meal.strMeasure1,
+          strMeasure2: meal.strMeasure2,
+          strMeasure3: meal.strMeasure3,
+          strMeasure4: meal.strMeasure4,
+          strMeasure5: meal.strMeasure5,
+          strMeasure6: meal.strMeasure6,
+          strMeasure7: meal.strMeasure7,
+          strMeasure8: meal.strMeasure8,
+          strMeasure9: meal.strMeasure9,
+          strMeasure10: meal.strMeasure10,
+          strMeasure11: meal.strMeasure11,
+          strMeasure12: meal.strMeasure12,
+          strMeasure13: meal.strMeasure13,
+          strMeasure14: meal.strMeasure14,
+          strMeasure15: meal.strMeasure15,
+          strMeasure16: meal.strMeasure16,
+          strMeasure17: meal.strMeasure17,
+          strMeasure18: meal.strMeasure18,
+          strMeasure19: meal.strMeasure19,
+          strMeasure20: meal.strMeasure20,
           strSource: meal.strSource,
           strSteps: meal.strSteps,
           strTime: meal.strTime,
           strType: meal.strType
           // Add other properties you need
         }));
-
-        console.log(newMeals);
         // Assume setMeals là một hàm hoặc phương thức để cập nhật trạng thái React
         setMeals(newMeals);
       });
@@ -126,28 +228,34 @@ export default function HomeScreen() {
       >
         {/* avatar and bell icon */}
         <View className="mx-4 flex-row justify-between items-center mb-2">
+          <Image
+                source={require('../../assets/images/recipes.png')}
+                style={{width: hp(14), height: hp(5), marginTop:hp(1)}}
+          />
           <TouchableOpacity onPress={handleAvatarPress}>
             {user ?
-              <Image source={require('../../assets/images/avatar.png')} style={{ height: hp(5), width: hp(5.5) }} />
+              <Image source={require('../../assets/images/avatar.png')} style={{ height: hp(5.5), width: hp(5.5) }} />
               :
-              <Image source={require('../../assets/images/welcome.png')} style={{ height: hp(5), width: hp(5.5) }} />
+              <Image source={require('../../assets/images/welcome.png')} style={{ height: hp(5.5), width: hp(5.5) }} />
             }
           </TouchableOpacity>
         </View>
 
         {/* greetings and punchline */}
         <View className="mx-4 space-y-2 mb-2">
-          {user && (
-            <Text style={{ fontSize: hp(1.7) }} className="text-neutral-600">
-              Xin chào, {user.email}
+          {user ?
+              <Text style={{ fontSize: hp(2) }} className="text-neutral-600">
+                 Xin chào, {name}
+              </Text>
+           :
+           (
+            <Text style={{ fontSize: hp(2) , color: 'white'}} className="text-neutral-600">
+              Xin chào, {name}
             </Text>
           )}
           <View>
-            <Text style={{ fontSize: hp(3.8) }} className="font-semibold text-neutral-600">Tự nấu các món ngon</Text>
+            <Text style={{ fontSize: hp(3.8) }} className="font-semibold text-neutral-600">Hôm nay bạn muốn nấu món gì ?</Text>
           </View>
-          <Text style={{ fontSize: hp(3.8) }} className="font-semibold text-neutral-600">
-            ngay tại <Text className="text-amber-400">nhà</Text>
-          </Text>
         </View>
 
         {/* search bar */}
@@ -157,14 +265,14 @@ export default function HomeScreen() {
             placeholderTextColor={'gray'}
             style={{ fontSize: hp(1.7) }}
             className="flex-1 text-base mb-1 pl-3 tracking-wider"
+            onChangeText={(text) => setSearch(text)}
           />
           <View className="bg-white rounded-full p-3">
             <MagnifyingGlassIcon size={hp(2.5)} strokeWidth={3} color="gray" />
           </View>
         </View>
-
-        {/* categories */}
-        <View>
+         {/* categories */}
+         <View>
           {categories.length > 0 && <Categories categories={categories} activeCategory={activeCategory} handleChangeCategory={handleChangeCategory} />}
         </View>
 

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, Alert } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {ArrowLeftIcon} from 'react-native-heroicons/solid'
@@ -12,21 +12,20 @@ export default function ForgetPasswordScreen() {
   const [email, setEmail] = useState("");
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        navigation.replace("Home")
-      }
-    })
-    return unsubscribe
-  }, [])
-
   const handleXN = () => {
+    if (!email) {
+      Alert.alert('Thông báo', 'Hãy nhập đầy đủ thông tin', [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
+      return;
+    }
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        arlert("Đổi mật khẩu thành công")
+        Alert.alert('Thông báo', 'Đã gửi. Vui lòng kiểm tra mail', [
+          {text: 'OK', onPress: () => navigation.navigate('Login')},
+        ]);
       })
-      .catch(error => alert(error.message))
+      .catch(error => alert("Lỗi"))
   }
 
   const signInWithGoogle = async () => {
